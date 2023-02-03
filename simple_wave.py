@@ -35,7 +35,7 @@ def get_next_y(i, j, y, delta_t, delta_x, v):
         return 0
     A = y[i+1, j] - 2*y[i, j] + y[i-1, j]
     B = 2*y[i, j] - y[i, j-1]
-    return k * A + B
+    return k * A + B #rearranged PDE for y(x_i, t_{j+1}) ie the solution for displacement at same pos, next time
 
 def gen_plot(model_state):
     fig = plt.figure()
