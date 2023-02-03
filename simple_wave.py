@@ -1,23 +1,18 @@
+#a test example for computation of the wave equation
+
 import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-delta_x = 0.5
-delta_t = 1e-2
-wave_speed = 10
-total_time = 2000*4
-x_size = 1000
-
 def init_pos_bell(x_size, x_scaling, y_scaling):
+    '''A possible starting shape'''
     return [y_scaling*math.e**(-1*(((x-x_size/2)*x_scaling)**2)) for x in range(x_size)]
 
-initial_pos = init_pos_bell(x_size, 0.01, 1)
-initial_velocity = [0]*x_size
-
-def init_model(total_time, initial_pos, initial_velocity, delta_t=delta_t):
+def init_model(total_time, initial_pos, initial_velocity, delta_t):
     '''
     Return an initialised array of correct shape with first
-    two timesteps adequately filled for normal calculation.
+    two timesteps (t=-1 and t=0 which are stored as t0 and t1)
+    adequately filled for normal calculation.
     '''
     if len(initial_pos) != len(initial_velocity):
         print('oops, len(initial_pos) != len(initial_velocity)')
@@ -30,9 +25,7 @@ def init_model(total_time, initial_pos, initial_velocity, delta_t=delta_t):
     
     return y
 
-y = init_model(total_time, initial_pos, initial_velocity)
-
-def get_next_y(i, j, y, delta_t=delta_t, delta_x=delta_x, v=wave_speed,):
+def get_next_y(i, j, y, delta_t, delta_x, v):
     '''
     Return y(x_i, t_j+1) based on data from surrounding and previous points in y.
     Boundary conditions: constant: y(x_i, t_i) = 0.
@@ -47,21 +40,32 @@ def get_next_y(i, j, y, delta_t=delta_t, delta_x=delta_x, v=wave_speed,):
 def gen_plot(model_state):
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
-    x = [range(model_state.shape[1])]
-    y = [range(model_state.shape[0])]
+    x = [range(model_state.shape[1])]#times ie {0, 1, 2 ... total_time} where the number represents the num timesteps
+    y = [range(model_state.shape[0])]#positions across the line
     x, y = np.meshgrid(x, y)
-    ax.plot_surface(x, y, model_state)
+    ax.plot_surface(x, y, model_state)#model_state (ie y(x, t)) contains all the vertical displacements of points on the wave for a given time and position.
     ax.set_ylabel('distance along string')
     ax.set_xlabel('time (num. steps)')
     plt.show()
 
-def run_sim(img_mode:str, total_time=total_time, initial_pos=initial_pos):
+def run_sim(y, img_mode:str, total_time, initial_pos, delta_t, delta_x, wave_speed):
     #run
     for j in range(1, total_time-1):
-        y[:,j+1] = [get_next_y(i, j, y) for i in range(len(initial_pos))]
+        y[:,j+1] = [get_next_y(i, j, y, delta_t, delta_x, wave_speed) for i in range(len(initial_pos))]
     #gen plot
     if img_mode == 'graph':
         gen_plot(y)
 
 if __name__ == '__main__':
-    run_sim(img_mode='graph')
+    #general parameters
+    delta_x = 0.5
+    delta_t = 1e-2
+    wave_speed = 10
+    total_time = 2000*4
+    x_size = 1000
+
+    initial_pos = init_pos_bell(x_size, 0.01, 1) #function for initial shape of curve
+    initial_velocity = [0]*x_size #initial velocities of points on the wave
+
+    y = init_model(total_time, initial_pos, initial_velocity, delta_t) #set up array and create first two timesteps so normal algorithm works
+    run_sim(y, delta_t=delta_t, delta_x=delta_x, wave_speed=wave_speed, img_mode='graph', total_time=1000*8, initial_pos=initial_pos) #run next timesteps with parameters
