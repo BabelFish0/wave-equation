@@ -12,9 +12,9 @@ $$
 The initial position of the string is defined as some function $f(x)$ such as $ae^{-(bx-c)^2}$. The initial velocies are also specified by some other function $g(x)$.
 
 $$
-y(x_i, t=0)=f(x_i)\\
-\dot{y}(x_i, t=0)=g(x_i)\\
-= \frac{y(x_i, t=0)-y(x_i, t=-1)}{\Delta t}\\
+y(x_i, t=0)=f(x_i)\\\\
+\dot{y}(x_i, t=0)=g(x_i)\\\\
+= \frac{y(x_i, t=0)-y(x_i, t=-1)}{\Delta t}\\\\
 \implies y(i, t=-1) = f(x_i)-\Delta t g(x_i)
 $$
 
