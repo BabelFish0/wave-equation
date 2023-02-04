@@ -3,6 +3,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
 
+plt.rcParams['text.usetex'] = True
+
 #init fig and axes
 fig = plt.figure()
 ax = plt.axes()
@@ -18,6 +20,8 @@ x_size = 1000
 initial_pos = wav.init_pos_bell(x_size, 0.01, 1)
 ax.set_ylim(-max(initial_pos), max(initial_pos))
 ax.set_xlim(0, x_size)
+ax.set_xlabel(r'$x_i$')
+ax.set_ylabel(r'$y(x_i, t_j)$')
 
 global y
 y = wav.init_model(total_time, initial_pos, [0]*len(initial_pos), delta_t)
