@@ -23,3 +23,11 @@ In this way a timestep $t_{-1}$ is inferred from the specified initial position 
 ![Looping animation of single wave](/images/wave_anim_loop.gif)
 
 ![Graph version of above example](/images/graph_wave.png)
+
+## Code
+
+- modelling is mostly handled in [simple_wave.py](/src/simple_wave.py)
+- matplotlib animation is handled in [animated_wave.py](/src/animated_wave.py)
+- various initial position and velocity functions are kept in [pos_vel_init.py](/src/pos_vel_init.py)
+
+[simple_wave.py](/src/simple_wave.py) will generate a plot of all the timesteps if run standalone; however, it is intended to be used as a module for [animated_wave.py](/src/animated_wave.py), where its functions are used to update the model state for each frame. This is what is run to obtain the final output of a realtime or saved animation. In the animated version, the code only stores 3 timesteps at a time as it displays them immediately.
