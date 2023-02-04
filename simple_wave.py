@@ -1,5 +1,5 @@
 #a test example for computation of the wave equation
-
+import pos_vel_init as pv_init
 import matplotlib.pyplot as plt
 import numpy as np
 import math
@@ -64,8 +64,10 @@ if __name__ == '__main__':
     total_time = 2000*4
     x_size = 1000
 
-    initial_pos = init_pos_bell(x_size, 0.01, 1) #function for initial shape of curve
-    initial_velocity = [0]*x_size #initial velocities of points on the wave
+    # initial_pos = init_pos_bell(x_size, 0.01, 1) #function for initial shape of curve
+    # initial_velocity = [0]*x_size #initial velocities of points on the wave
+
+    initial_pos, initial_velocity, y_min, y_max = pv_init.bell_at_rest(x_size, 0.01, 1)
 
     y = init_model(total_time, initial_pos, initial_velocity, delta_t) #set up array and create first two timesteps so normal algorithm works
     run_sim(y, delta_t=delta_t, delta_x=delta_x, wave_speed=wave_speed, img_mode='graph', total_time=1000*8, initial_pos=initial_pos) #run next timesteps with parameters
