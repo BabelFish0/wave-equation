@@ -1,4 +1,3 @@
-#a test example for computation of the wave equation
 import pos_vel_init as pv_init
 import matplotlib.pyplot as plt
 import numpy as np
@@ -18,7 +17,7 @@ def init_model(total_time, initial_pos, initial_velocity, delta_t):
         print('oops, len(initial_pos) != len(initial_velocity)')
         return
     
-    y = np.zeros(shape=(len(initial_pos), total_time), dtype=np.float64) #num x points, num t steps
+    y = np.zeros(shape=(len(initial_pos), total_time), dtype=np.float64) #shape = (num x points, num t steps), array initialised for num t_steps that will be stored
 
     y[:, 0] = [initial_pos[i] - delta_t*initial_velocity[i] for i in range(len(initial_pos))]
     y[:, 1] = initial_pos
@@ -38,6 +37,9 @@ def get_next_y(i, j, y, delta_t, delta_x, v):
     return k * A + B #rearranged PDE for y(x_i, t_{j+1}) ie the solution for displacement at same pos, next time
 
 def gen_plot(model_state):
+    '''
+    Generate full plot of position against time against vertical displacement.
+    '''
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
     x = [range(model_state.shape[1])]#times ie {0, 1, 2 ... total_time} where the number represents the num timesteps
@@ -49,6 +51,9 @@ def gen_plot(model_state):
     plt.show()
 
 def run_sim(y, img_mode:str, total_time, initial_pos, delta_t, delta_x, wave_speed):
+    '''
+    Standard run parameters for saving all timesteps (not used by animator).
+    '''
     #run
     for j in range(1, total_time-1):
         y[:,j+1] = [get_next_y(i, j, y, delta_t, delta_x, wave_speed) for i in range(len(initial_pos))]
@@ -57,6 +62,10 @@ def run_sim(y, img_mode:str, total_time, initial_pos, delta_t, delta_x, wave_spe
         gen_plot(y)
 
 if __name__ == '__main__':
+    '''
+    Default output if not imported as a module..
+
+    '''
     #general parameters
     delta_x = 0.5
     delta_t = 1e-2
@@ -67,7 +76,7 @@ if __name__ == '__main__':
     # initial_pos = init_pos_bell(x_size, 0.01, 1) #function for initial shape of curve
     # initial_velocity = [0]*x_size #initial velocities of points on the wave
 
-    initial_pos, initial_velocity, y_min, y_max = pv_init.bell_at_rest(x_size, 0.01, 1)
+    initial_pos, initial_velocity, y_min, y_max = pv_init.bell_at_rest(x_size, 0.01, 1) #updated standard init func
 
     y = init_model(total_time, initial_pos, initial_velocity, delta_t) #set up array and create first two timesteps so normal algorithm works
     run_sim(y, delta_t=delta_t, delta_x=delta_x, wave_speed=wave_speed, img_mode='graph', total_time=1000*8, initial_pos=initial_pos) #run next timesteps with parameters
