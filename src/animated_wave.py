@@ -15,14 +15,8 @@ line, = ax.plot([], [])
 delta_x = 0.5
 delta_t = 1e-2
 wave_speed = 10
-total_time = 3 #note this is the frame cache size
+total_time = 3 #note this is the frame cache size (only 3 states are stored at a time for the animator)
 x_size = 1000
-
-#initial_pos = wav.init_pos_bell(x_size, 0.01, 1) #bell curve at rest
-#initial_vel = [0]*len(initial_pos)
-
-# initial_vel = wav.init_vel_discont(100, x_size, 1)#flat line with middle region struck
-# initial_pos = [0]*len(initial_vel)
 
 initial_pos, initial_vel, y_min, y_max = pv_init.bell_at_rest(x_size, 1e-2, 1)
 
