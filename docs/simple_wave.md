@@ -12,8 +12,11 @@ $$
 The initial position of the string is defined as some function $f(x)$ such as $ae^{-(bx-c)^2}$. The initial velocies are also specified by some other function $g(x)$.
 
 $$ y(x_i, t_0)=f(x_i) $$
+
 $$ \dot{y}(x_i, t_0)=g(x_i) $$
+
 $$ = \frac{y(x_i, t_0)-y(x_i, t_{-1})}{\Delta t} $$
+
 $$ \implies y(x_i, t_{-1}) = f(x_i)-\Delta t g(x_i) $$
 
 In this way a timestep $t_{-1}$ is inferred from the specified initial position and velocity functions. This is used to initialise the first two timesteps in the model and subsequently timesteps have enough information to be calculated normally.
