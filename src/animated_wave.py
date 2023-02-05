@@ -15,7 +15,7 @@ line, = ax.plot([], [])
 
 #init data for wave eqn
 delta_x = 0.5
-length = 500
+length = 500 #string length
 delta_t = 1e-2
 wave_speed = 10
 total_time = 3 #note this is the frame cache size (only 3 states are stored at a time for the animator)
@@ -42,14 +42,6 @@ for i, an_text in enumerate(annotation['text']):
 global y #all displacement data is held in the array 'y'.
 y = wav.init_model(total_time, initial_pos, initial_vel, delta_t)
 
-def update_wave(delta_t=delta_t, delta_x=delta_x, wave_speed=wave_speed):
-    '''
-    Given two previous timesteps of y(x, t), calculate the next.
-    '''
-    global y
-    #calculate next y at t_2 for every x
-    return [wav.get_next_y(i, 1, y, delta_t, delta_x, wave_speed) for i in range(x_size)]
-
 def init():
     '''Function to reset animation'''
     line.set_data([], [])
@@ -69,7 +61,7 @@ def animate(i, x_size=x_size, delta_x=delta_x, fps = frame_rate, tps = simulatio
 
     #run the simulation for a certain number of timesteps per frame (retains accuracy w/o slow animation)
     for k in range(math.ceil(tps/fps)):
-        y[:, 2] = update_wave() #overwrite next timestep (t_3)
+        y[:, 2] = [wav.get_next_y(i, 1, y, delta_t, delta_x, wave_speed) for i in range(x_size)] #overwrite next timestep (t_3)
         y = np.roll(y, -1, axis=1) #roll timesteps back so that t_0 becomes t_3 in the array
 
     bar.next()
