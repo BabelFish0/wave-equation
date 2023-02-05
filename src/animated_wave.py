@@ -4,7 +4,7 @@ import numpy as np
 import math
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
-from progress.bar import Bar
+from progress.bar import ShadyBar
 
 plt.rcParams['text.usetex'] = True #use TeX for axes labels
 
@@ -15,15 +15,16 @@ line, = ax.plot([], [])
 
 #init data for wave eqn
 delta_x = 0.5
+length = 500
 delta_t = 1e-2
 wave_speed = 10
 total_time = 3 #note this is the frame cache size (only 3 states are stored at a time for the animator)
-x_size = 1000
 frame_rate = 60 #frames per second
 simulation_speed = 1000 #timesteps per second
 total_frames = 500
 
 #create two arrays: initial_pos and initial_vel which hold position and velocity data for every x at t_0.
+x_size = int(length/delta_x)
 initial_pos, initial_vel, y_min, y_max = pv_init.bell_at_rest(x_size, x_scaling=1e-2, y_scaling=1)
 
 #define view bounds based on starting condition
@@ -31,6 +32,12 @@ ax.set_ylim(y_min, y_max)
 ax.set_xlim(0, x_size*delta_x)
 ax.set_xlabel(r'$x_i$')
 ax.set_ylabel(r'$y(x_i, t_j)$')
+
+#information at top of plot
+annotation = {'text':['$\Delta t=' + str(delta_t) + '$', '$\Delta x=' + str(delta_x) + '$', '$v =' + str(wave_speed) + '$']}
+annotation['xy'] = [(0.05*x_size*delta_x, y_max-(i+1)*((y_max-0.6*y_max)/len(annotation['text']))) for i in range(len(annotation['text']))]
+for i, an_text in enumerate(annotation['text']):
+    ax.annotate(an_text, annotation['xy'][i])
 
 global y #all displacement data is held in the array 'y'.
 y = wav.init_model(total_time, initial_pos, initial_vel, delta_t)
@@ -69,10 +76,10 @@ def animate(i, x_size=x_size, delta_x=delta_x, fps = frame_rate, tps = simulatio
     return line,
 
 # Run animation
-bar = Bar('Processing', max=total_frames)
+bar = ShadyBar('Processing', max=total_frames, suffix='%(index)i/%(max)i %(eta)ds')
 frame_time_ms = 1/frame_rate * 1_000
 anim = FuncAnimation(fig, animate, init_func=init, frames=total_frames, interval=frame_time_ms)#10ms is good for realtime, set to <<1 for rendering
 
-anim.save('wave_anim_loop.gif')
+#anim.save('wave_anim_loop.gif')
 bar.finish()
-#plt.show()
+plt.show()
