@@ -58,3 +58,13 @@ class Model:
     
     def shift_timesteps(self, shift:int, axis=1) -> None:
         self.y = np.roll(self.y, shift, axis=1)
+    
+    def randomize_wave_speed(self, min_max:tuple=(5, 15), section_width:int=500, seed:int = 0) -> None:
+        import random
+        random.seed = seed
+        wave_speed = []
+        x_size = self.get_num_x_steps()
+        for i in range(x_size//section_width):
+            modifier = random.random()
+            wave_speed += [min_max[0] + (min_max[1]-min_max[0])*modifier]*section_width
+        self.params['wave_speed'] = wave_speed + [min_max[0] + (min_max[1]-min_max[0])*modifier]*(x_size%section_width)

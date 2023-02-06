@@ -1,11 +1,13 @@
 import general_wave as wave
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
+import random
 import math
 
 model = wave.Model()
 model.useDefaultParams()
 model.params['total_frames'] = 3
+model.randomize_wave_speed(section_width=100, min_max=(1, 20))
 model.init_model()
 
 #init fig and axes
