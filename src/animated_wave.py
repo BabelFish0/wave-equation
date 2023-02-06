@@ -34,7 +34,7 @@ ax.set_xlabel(r'$x_i$')
 ax.set_ylabel(r'$y(x_i, t_j)$')
 
 #information at top of plot
-annotation = {'text':['$\Delta t=' + str(delta_t) + '$', '$\Delta x=' + str(delta_x) + '$', '$v =' + str(wave_speed) + '$']}
+annotation = {'text':['$\Delta t=' + str(delta_t) + '$', '$\Delta x=' + str(delta_x) + '$', '$v =' + str(wave_speed) + '$']} #TODO: add units in correct formatting
 annotation['xy'] = [(0.05*x_size*delta_x, y_max-(i+1)*((y_max-0.6*y_max)/len(annotation['text']))) for i in range(len(annotation['text']))]
 for i, an_text in enumerate(annotation['text']):
     ax.annotate(an_text, annotation['xy'][i])

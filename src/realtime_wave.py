@@ -45,7 +45,7 @@ def animate(i):
 
 # Run animation
 frame_time_ms = 1/fps * 1_000
-anim = FuncAnimation(fig, animate, init_func=init, frames=500, interval=frame_time_ms)#10ms is good for realtime, set to <<1 for rendering
+anim = FuncAnimation(fig, animate, init_func=init, frames=1000, interval=frame_time_ms)#10ms is good for realtime, set to <<1 for rendering
 
-#anim.save('wave_anim_loop.gif')
-plt.show()
+anim.save('wave_anim_random_v.gif')
+#plt.show()
