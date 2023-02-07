@@ -11,6 +11,8 @@ class Model:
     def constBoundary(self, i) -> int:
         return 0
 
+    #add enforce() which runs boundary condition on its own
+
     def useCustomParams(self, delta_x:float, length:float, delta_t:float, wave_speed:float, total_frames:int, boundary_condition:Callable) -> None:
         self.params = {
             'delta_x' : delta_x,
