@@ -63,7 +63,7 @@ class Model:
     
     def randomize_wave_speed(self, min_max:tuple=(5, 15), section_width:int=500, seed:int = 0) -> None:
         import random
-        random.seed = seed
+        random.seed = seed #TODO: fix random seed
         wave_speed = []
         x_size = self.get_num_x_steps()
         for i in range(x_size//section_width):
