@@ -5,12 +5,14 @@ import random
 import math
 
 model = wave.Model()
+pos_vel_init = wave.Initializer()
 model.useDefaultParams()
 model.params['total_frames'] = 3
-#model.randomize_wave_speed(section_width=100, min_max=(8, 12))
-model.params['wave_speed'] = [10]*300 + [30]*400 + [10]*300
-model.init_pos = [1*math.e**(-1*(((x-250)*0.1)**2)) for x in range(1000)]
-model.init_vel = [-2*model.params['wave_speed'][i] * math.e ** (-(0.1**2)*((i-250)**2)) * (-2*0.1**2*(i-250)) for i in range(1000)]
+# model.params['wave_speed'] = [10]*300 + [30]*400 + [10]*300
+model.params['tension'] = [1]*1000
+model.params['mass_density'] = [0.01]*300 + [1/900]*400 + [0.01]*300
+model.params['wave_speed'] = [math.sqrt(model.params['tension'][i]/model.params['mass_density'][i]) for i in range(len(model.params['tension']))]
+model.init_pos, model.init_vel = pos_vel_init.gauss(velocity=model.params['wave_speed'], shift=50, width=10)
 model.init_model()
 
 #init fig and axes
@@ -22,8 +24,8 @@ ax.set_xlim(0, model.params['length'])
 ax.set_xlabel(r'$x_i$')
 ax.set_ylabel(r'$y(x_i, t_j)$')
 
-tps = 1000
-fps = 30
+tps = 500 #sim speed
+fps = 30 #frame rate
 
 def init():
     '''Function to reset animation'''
@@ -36,6 +38,7 @@ def animate(i):
     #set graph data
     graphX = model.get_all_x_positions()
     graphY = model.y[:, 1] #all y(x_i) for current timestep
+    print(model.e)
 
     #update graph with said data
     line.set_data(graphX, graphY)

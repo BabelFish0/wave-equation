@@ -2,32 +2,50 @@ import numpy as np
 import math
 from typing import Callable
 
+class Initializer:
+    
+    def gauss(self, x_size:int=1000, delta_x:float=0.5, width:float=25, shift:float=250, amplitude:float=1, velocity:list=[0]*1000) -> tuple:
+        '''Initialize with a gaussian wave
+        https://www.desmos.com/calculator/ogk6wf0kq5
+        '''
+        def calc_exponent(x, width=width, shift=shift):
+            numerator = -(x-shift)**2
+            denominator = width**2
+            return numerator/denominator
+        init_pos = [amplitude*math.e**calc_exponent(x*delta_x) for x in range(x_size)]
+        init_vel = [-velocity[x]*pos*(2/width**2)*(shift-x*delta_x) for x, pos in enumerate(init_pos)]
+        return init_pos, init_vel
+        #fix amplitude
+
 class Model:
     params = {}
     init_pos = []
     init_vel = []
     y = []
+    e = 0
 
-    def constBoundary(self, i) -> int:
+    def constBoundary(self, i:int) -> int:
         return 0
 
-    #add enforce() which runs boundary condition on its own
-
-    def useCustomParams(self, delta_x:float, length:float, delta_t:float, wave_speed:float, total_frames:int, boundary_condition:Callable) -> None:
+    def useCustomParams(self, delta_x:float, length:float, delta_t:float, total_frames:int, boundary_condition:Callable, wave_speed:list=None, mass_density:list=None, tension:list=None) -> None:
+        if (mass_density and tension) and not wave_speed:
+            wave_speed = [math.sqrt(tension[i]/mass_density[i]) for i in range(len(tension))]
         self.params = {
             'delta_x' : delta_x,
             'length' : length,
             'delta_t' : delta_t,
             'wave_speed' : wave_speed,
+            'mass_density' : mass_density,
+            'tension' : tension,
             'total_frames' : total_frames,
             'boundary_condition' : boundary_condition
         }
 
     def useDefaultParams(self) -> None:
-        self.useCustomParams(0.5, 500, 1e-2, [10]*1000, 500, self.constBoundary)
+        self.useCustomParams(0.5, 500, 1e-2, 500, self.constBoundary, tension=[100]*1000, mass_density=[1]*1000)
         if not (len(self.init_pos) or len(self.init_vel)):
-            self.init_pos = [1*math.e**(-1*(((x-500)*1e-2)**2)) for x in range(1000)]
-            self.init_vel = [0]*len(self.init_pos)
+            init = Initializer()
+            self.init_pos, self.init_vel = init.gauss()
 
     def init_model(self) -> None:
         init_pos = self.init_pos
@@ -49,7 +67,9 @@ class Model:
     
     def compute_timestep(self, j:int) -> None:
         x_size = int(self.params['length']/self.params['delta_x'])
+        # self.k_e, self.p_e = self.compute_energy(j)
         self.y[:, j+1] = [self.compute_y(i, j) for i in range(x_size)]
+        self.e = sum(self.energy(j))
     
     def get_all_x_positions(self) -> list:
         x_size, delta_x = int(self.params['length']/self.params['delta_x']), self.params['delta_x']
@@ -70,3 +90,38 @@ class Model:
             modifier = random.random()
             wave_speed += [min_max[0] + (min_max[1]-min_max[0])*modifier]*section_width
         self.params['wave_speed'] = wave_speed + [min_max[0] + (min_max[1]-min_max[0])*modifier]*(x_size%section_width)
+    
+    def ke(self, i:int, j:int) -> float:
+        y = self.y
+        delta_t = self.params['delta_t']
+        delta_x = self.params['delta_x']
+        rho = self.params['mass_density'][i]
+        y_dot = (y[i, j] - y[i, j-1])/delta_t
+        return 0.5 * rho * delta_x * y_dot**2
+
+    def delta_l(self, j:int) -> float:
+        x_size = self.get_num_x_steps()
+        y = self.y
+        delta_x = self.params['delta_x']
+        current_length = sum([math.sqrt((y[i, j]-y[i-1, j])**2+delta_x**2) for i in range(1, x_size)])
+        return current_length - self.params['length']
+    
+    def energy(self, j:int) -> float:
+        x_size = self.get_num_x_steps()
+        ke_at_each_x = [self.ke(i, j) for i in range(1, x_size)]
+        pe = 0.5*self.params['tension'][0]*self.delta_l(j)**2
+        return sum(ke_at_each_x), pe
+
+    # def compute_power(self, i:int, j:int) -> float:
+    #     y = self.y
+    #     delta_t = self.params['delta_t']
+    #     delta_x = self.params['delta_x']
+    #     y_prime = (y[i, j] - y[i-1, j])/delta_x
+    #     y_dot = (y[i, j] - y[i, j-1])/delta_t
+    #     return y_prime * y_dot
+    
+    # def compute_energy(self, j:int) -> float:
+    #     x_size = self.get_num_x_steps()
+    #     ke_at_each_x = [self.compute_power(i, j) for i in range(1, x_size)]
+    #     pe = self.compute_extension(j)**2
+    #     return sum(ke_at_each_x), pe
