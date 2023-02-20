@@ -12,7 +12,7 @@ model.params['total_frames'] = 3
 model.params['tension'] = [1]*1000
 model.params['mass_density'] = [0.01]*500 + [1/900]*500
 model.params['wave_speed'] = [math.sqrt(model.params['tension'][i]/model.params['mass_density'][i]) for i in range(len(model.params['tension']))]
-model.init_pos, model.init_vel = pos_vel_init.gauss(velocity=model.params['wave_speed'], shift=50, width=10)
+model.init_pos, model.init_vel = pos_vel_init.gauss(velocity=model.params['wave_speed'], shift=150, width=10)
 model.init_model()
 
 #init fig and axes
@@ -35,7 +35,7 @@ def init():
 def reset_model(rho1, rho2):
     model.params['mass_density'] = [rho1]*500 + [rho2]*500
     model.params['wave_speed'] = [math.sqrt(model.params['tension'][i]/model.params['mass_density'][i]) for i in range(len(model.params['tension']))]
-    model.init_pos, model.init_vel = pos_vel_init.gauss(velocity=model.params['wave_speed'], shift=50, width=10)
+    model.init_pos, model.init_vel = pos_vel_init.gauss(velocity=model.params['wave_speed'], shift=150, width=10)
     model.init_model()
 
 def animate(i):
@@ -54,9 +54,9 @@ def animate(i):
         model.compute_timestep(1) #overwrite next timestep (t_3)
         model.shift_timesteps(-1) #roll timesteps back so that t_0 becomes t_3 in the array
 
-        if model.has_wave_passed(550, 1):
+        if model.has_wave_passed(650, 1):
             print(f'A_R: {max(model.y[:500, 1])}, A_T: {max(model.y[500:, 1])}, wave speed: ', model.params['wave_speed'][0], model.params['wave_speed'][-1])
-            reset_model(0.01, model.params['mass_density'][-1]+0.01)
+            reset_model(0.01, model.params['mass_density'][-1]-0.00001)
     return line,
 
 # Run animation
