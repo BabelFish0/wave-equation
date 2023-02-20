@@ -111,6 +111,14 @@ class Model:
         ke_at_each_x = [self.ke(i, j) for i in range(1, x_size)]
         pe = 0.5*self.params['tension'][0]*self.delta_l(j)**2
         return sum(ke_at_each_x), pe
+    
+    def has_wave_passed(self, i:int, j:int) -> bool:
+        '''Returns `True` if a maximum passes a point $x_j$ at time $t_j$.'''
+        y_prime = (self.y[i, j] - self.y[i-1, j])/self.params['delta_x']
+        y_prime_before = (self.y[i, j-1] - self.y[i-1, j-1])/self.params['delta_x']
+        if y_prime_before == 0:
+            return False
+        return bool(np.sign(y_prime) - np.sign(y_prime_before))
 
     # def compute_power(self, i:int, j:int) -> float:
     #     y = self.y
