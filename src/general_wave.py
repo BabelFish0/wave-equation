@@ -4,7 +4,7 @@ from typing import Callable
 
 class Initializer:
     
-    def gauss(self, x_size:int=1000, delta_x:float=0.5, width:float=25, shift:float=250, amplitude:float=1, velocity:list=[0]*1000) -> tuple:
+    def gauss(self, x_size:int=1000, delta_x:float=0.5, width:float=25, shift:float=250, amplitude:float=1, velocity:list=[0]*1000):
         '''Initialize with a gaussian wave
         https://www.desmos.com/calculator/ogk6wf0kq5
         '''
@@ -52,6 +52,7 @@ class Model:
         self.y = np.zeros(shape=(len(init_pos), self.params['total_frames']))
         self.y[:, 0] = [init_pos[i] - self.params['delta_t']*self.init_vel[i] for i in range(len(init_pos))]
         self.y[:, 1] = init_pos
+        self.e = sum(self.energy(1))
     
     def compute_y(self, i:int, j:int) -> float:
         v = self.params['wave_speed'][i]
@@ -119,6 +120,79 @@ class Model:
         if y_prime_before == 0:
             return False
         return bool(np.sign(y_prime) - np.sign(y_prime_before))
+    
+    def dy_dx(self, j:int) -> list:
+        return [(self.y[i, j] - self.y[i-1, j])/self.params['delta_x'] for i in range(1, self.y.shape[0]-1)]
+    
+    def d2y_dx2(self, j:int) -> list:
+        return [(self.y[i+1, j] - 2*self.y[i, j] + self.y[i-1, j])/self.params['delta_x']**2 for i in range(1, self.y.shape[0]-1)]
+    
+    def d2y_dt2(self, j:int) -> list:
+        return [(self.y[i, j] - 2*self.y[i, j-1] + self.y[i, j-2])/self.params['delta_t']**2 for i in range(self.y.shape[0]-1)]
+
+    def generate_random_sections(self, l, n, scaling, min=0.01, seed=0):
+        """
+        Generate an array of length l divided into n sections,
+        each of which is set to a random value.
+
+        Parameters:
+        l (int): The length of the array
+        n (int): The number of sections to divide the array into
+
+        Returns:
+        numpy.ndarray: An array of length l divided into n sections,
+        each of which is set to a random value.
+        """
+        np.random.seed = seed
+
+        section_length = l // n  # Calculate the length of each section
+        remainder = l % n  # Calculate the remainder, if any
+
+        # Create an array of zeros with length l
+        arr = []
+
+        for section in range(n-1):
+            arr += [np.random.random()*scaling+min]*section_length
+        arr += [np.random.random()*scaling+min]*(section_length+remainder)
+
+        return arr
+
+    import numpy as np
+
+    def generate_alternating_sections(self, l, n, a, b):
+        """
+        Generate an array of length l divided into n sections,
+        with alternating values of a and b in each section.
+
+        Parameters:
+        l (int): The length of the array
+        n (int): The number of sections to divide the array into
+        a (float): The value to use for the first section and every other section after that
+        b (float): The value to use for the second section and every other section after that
+
+        Returns:
+        numpy.ndarray: An array of length l divided into n sections,
+                    with alternating values of a and b in each section.
+        """
+        section_length = l // n  # Calculate the length of each section
+        remainder = l % n  # Calculate the remainder, if any
+
+        # Create an array of zeros with length l
+        arr = [0]*l
+
+        # Set each section to alternating values of a and b
+        for i in range(n):
+            start = i * section_length
+            end = start + section_length
+            if i == n-1 and remainder != 0:
+                end += remainder
+            if i % 2 == 0:
+                arr[start:end] = a  # Set the section to a
+            else:
+                arr[start:end] = b  # Set the section to b
+
+        return arr
+
 
     # def compute_power(self, i:int, j:int) -> float:
     #     y = self.y
